@@ -1,0 +1,78 @@
+.skin-monobook .hlist dl,
+.skin-modern .hlist dl,
+.skin-vector .hlist dl {
+    line-height: 1.5em;
+}
+.hlist dl,
+.hlist ol,
+.hlist ul {
+    margin: 0;
+    padding: 0;
+}
+/* Display list items inline and make them nowrap */
+.hlist dd,
+.hlist dt,
+.hlist li {
+    margin: 0;
+    display: inline;
+    white-space: nowrap;
+    margin-inline: 0 !important;
+}
+/* Allow wrapping for list items (in tight spaces) */
+.hlist.hwrap dd,
+.hlist.hwrap dt,
+.hlist.hwrap li {
+    white-space: normal;
+}
+/* Display nested lists inline and allow them to wrap */
+.hlist dl dl, .hlist dl ol, .hlist dl ul,
+.hlist ol dl, .hlist ol ol, .hlist ol ul,
+.hlist ul dl, .hlist ul ol, .hlist ul ul {
+    display: inline;
+    white-space: normal;
+    margin-left: 0 !important;
+}
+/* Generate interpuncts */
+.hlist dt:after {
+    content: ":";
+}
+.hlist dd:after,
+.hlist li:after {
+    content: " ·";
+    font-weight: bold;
+}
+.hlist dd:last-child:after,
+.hlist dt:last-child:after,
+.hlist li:last-child:after {
+    content: none;
+}
+
+/* Add parentheses around nested lists */
+.hlist dd dd:first-child:before, .hlist dd dt:first-child:before, .hlist dd li:first-child:before,
+.hlist dt dd:first-child:before, .hlist dt dt:first-child:before, .hlist dt li:first-child:before,
+.hlist li dd:first-child:before, .hlist li dt:first-child:before, .hlist li li:first-child:before {
+    content: "(";
+    font-weight: normal;
+}
+.hlist dd dd:last-child:after, .hlist dd dt:last-child:after, .hlist dd li:last-child:after,
+.hlist dt dd:last-child:after, .hlist dt dt:last-child:after, .hlist dt li:last-child:after,
+.hlist li dd:last-child:after, .hlist li dt:last-child:after, .hlist li li:last-child:after {
+    content: ")";
+    font-weight: normal;
+}
+
+/* Put numbers in front of ordered list items */
+.hlist.hnum ol {
+    counter-reset: list-item;
+}
+.hlist.hnum ol > li {
+    counter-increment: list-item;
+}
+.hlist.hnum ol > li:before {
+    content: counter(list-item) " ";
+}
+.hlist.hnum dd ol > li:first-child:before,
+.hlist.hnum dt ol > li:first-child:before,
+.hlist.hnum li ol > li:first-child:before {
+    content: "(" counter(list-item) " ";
+}

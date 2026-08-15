@@ -1,0 +1,30 @@
+/* MediaWiki 1.43+ heading compatibility for Liberty */
+
+.mw-heading {
+    display: flex;
+    align-items: baseline;
+}
+
+.mw-heading > h2,
+.mw-heading > h3,
+.mw-heading > h4,
+.mw-heading > h5,
+.mw-heading > h6 {
+    flex: 1;
+}
+
+.mw-heading .mw-editsection,
+.mw-heading .mw-editsection-like {
+    float: none;
+    margin-left: auto;
+    margin-top: 0;
+    line-height: inherit;
+}
+
+.Liberty .content-wrapper .liberty-content .liberty-content-main .mw-heading2 {
+    border-bottom: 1px dashed #e1e8ed;
+}
+
+.Liberty .content-wrapper .liberty-content .liberty-content-main .mw-heading2 > h2 {
+    border-bottom: none !important;
+}
