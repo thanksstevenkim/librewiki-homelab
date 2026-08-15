@@ -1,0 +1,41 @@
+# Example Nginx configuration for LibreWiki Homelab
+#
+# Copy this file to:
+#   /etc/nginx/sites-available/librewiki
+#
+# Then enable it with:
+#   sudo ln -s /etc/nginx/sites-available/librewiki \
+#     /etc/nginx/sites-enabled/librewiki
+#
+# Test configuration:
+#   sudo nginx -t
+#
+# Reload Nginx:
+#   sudo systemctl reload nginx
+
+server {
+    listen 80;
+    server_name _;
+
+    # MediaWiki installation directory
+    root /var/www/mediawiki;
+    index index.php;
+
+    # Increase this value if larger MediaWiki XML imports are required.
+    client_max_body_size 50M;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # Pass PHP requests to PHP-FPM.
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php8.5-fpm.sock;
+    }
+
+    # Prevent access to hidden .ht* files.
+    location ~ /\.ht {
+        deny all;
+    }
+}
