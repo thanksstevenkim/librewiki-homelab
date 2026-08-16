@@ -460,6 +460,92 @@ Righteditlinks
 
 ---
 
+## Scribunto
+
+### Why It Was Needed
+
+Imported Libre Wiki modules and templates used syntax such as:
+
+```wiki
+{{#invoke:ModuleName|function}}
+```
+
+This requires Scribunto, which provides Lua scripting support for MediaWiki.
+
+During import and testing, pages in the Module: namespace were successfully created, but Lua execution initially failed with:
+
+```text
+Lua error: Internal error: The interpreter exited with status 126
+```
+
+### What Scribunto Provides
+
+Scribunto allows Lua modules stored in the:
+
+```wiki
+Module:
+```
+
+namespace to be executed from templates.
+
+The dependency chain looks like:
+
+```text
+Article
+   ↓
+Template
+   ↓
+#invoke
+   ↓
+Scribunto
+   ↓
+Lua module
+```
+
+### Enabling Scribunto
+
+Scribunto was enabled in `LocalSettings.php` with:
+
+```php
+wfLoadExtension( 'Scribunto' );
+```
+
+### ARM64 Lua Interpreter Issue
+
+The homelab runs on an ARM64 Ubuntu VM.
+
+The bundled Lua interpreter could not be executed correctly in this environment and exited with status 126.
+
+The system Lua 5.1 interpreter was installed instead:
+
+```bash
+sudo apt install lua5.1
+```
+
+Scribunto was then configured to use it:
+
+```php
+$wgScribuntoEngineConf['luastandalone']['luaPath'] = '/usr/bin/lua5.1';
+```
+
+PHP-FPM was restarted after the configuration change:
+
+```bash
+sudo systemctl restart php8.5-fpm
+```
+
+### Verification
+
+Imported `Module:` pages could then execute through `#invoke` without the interpreter error.
+
+### Lesson
+
+Installing an extension does not necessarily mean that all of its runtime dependencies are compatible with the host architecture.
+
+In this case, Scribunto itself was enabled correctly, but its Lua interpreter required additional configuration for the ARM64 environment.
+
+---
+
 ## Site CSS Is Not an Extension
 
 Some missing behavior initially looked like it might require another extension.
@@ -568,6 +654,7 @@ TemplateStyles
 ParserFunctions
 Cite
 Gadgets
+Scribunto
 ```
 
 The exact set will grow as more complex Libre Wiki pages are imported.
@@ -586,49 +673,12 @@ MediaWiki
 ├── Cite
 │   └── references
 │
+├── Scribunto
+│   └── Lua / #invoke
+│
 └── Gadgets
     └── Righteditlinks
 ```
-
----
-
-## Likely Next Extension: Scribunto
-
-One likely future dependency is Scribunto.
-
-Libre Wiki templates may contain:
-
-```wiki
-{{#invoke:ModuleName|function}}
-```
-
-This syntax requires Scribunto.
-
-Scribunto allows Lua code stored in:
-
-```text
-Module:
-```
-
-namespace pages to be executed by templates.
-
-The dependency chain would then look like:
-
-```text
-Article
-   ↓
-Template
-   ↓
-#invoke
-   ↓
-Scribunto
-   ↓
-Lua module
-```
-
-Scribunto has not yet been configured at the point documented here.
-
-It should be added only when imported content demonstrates the need.
 
 ---
 
@@ -870,7 +920,7 @@ A future inventory may look like:
 | Cite            | Extension | Enabled | References                    |
 | Gadgets         | Extension | Enabled | Site gadgets                  |
 | Righteditlinks  | Gadget    | Enabled | Section edit link layout      |
-| Scribunto       | Extension | Planned | Lua / `#invoke`               |
+| Scribunto       | Extension | Enabled | Lua / `#invoke`               |
 | VisualEditor    | Extension | Planned | Visual editing                |
 
 This table should be expanded as new dependencies are discovered.
@@ -945,6 +995,8 @@ MediaWiki 1.46
 │
 ├── Cite
 │
+├── Scribunto
+│
 └── Gadgets
       │
       └── Righteditlinks
@@ -964,8 +1016,8 @@ and locally written compatibility CSS.
 
 Planned extension work includes:
 
-- install Scribunto
-- test Lua module imports
+- test additional Lua module dependencies
+- import and verify more complex Lua modules
 - configure VisualEditor
 - identify additional Libre Wiki extensions
 - reproduce more gadgets
@@ -990,5 +1042,8 @@ This stage is complete when:
 - extension responsibilities are distinguished from gadgets and site CSS
 - missing features can be investigated through a repeatable dependency-discovery process
 - planned extensions are documented without installing them prematurely
+- Scribunto is enabled
+- Lua modules can be executed through `#invoke`
+- Scribunto uses the system Lua 5.1 interpreter in the ARM64 environment
 
-The next stage should focus on the remaining compatibility and troubleshooting work, especially the differences between Libre Wiki's existing frontend customizations and MediaWiki 1.46.
+The next stage should focus on VisualEditor and the remaining compatibility and troubleshooting work, especially the differences between Libre Wiki's existing frontend customizations and MediaWiki 1.46.

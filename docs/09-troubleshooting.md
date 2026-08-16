@@ -1013,6 +1013,46 @@ sudo systemctl restart php8.5-fpm
 
 Editing a configuration file does not necessarily change a running process.
 
+## 21. Scribunto Lua interpreter exited with status 126
+
+### Symptom
+
+```text
+Lua error: Internal error: The interpreter exited with status 126
+```
+
+### Cause
+
+Scribunto's bundled Lua binary was incompatible with the ARM64 environment.
+
+### Resolution
+
+Installed the system Lua 5.1 interpreter and configured Scribunto to use it instead of the bundled binary.
+
+```php
+$wgScribuntoEngineConf['luastandalone']['luaPath'] = '/usr/bin/lua5.1';
+```
+
+## 22. APT repository "Release file is not valid yet"
+
+### Symptom
+
+```text
+invalid for another 7h 48min 30s. Updates for this repository will not be applied.
+```
+
+### Cause
+
+The Ubuntu VM's system clock was out of sync with the actual time.
+
+### Resolution
+
+Checked the system time with `timedatectl` and re-synchronized it using NTP/chrony.
+
+### Lesson
+
+An APT repository error may look like a problem with the repository itself, but the actual cause can be an incorrect system clock.
+
 ---
 
 ## Troubleshooting by Layer
@@ -1455,7 +1495,6 @@ This provides the baseline for future work.
 
 Likely future issues include:
 
-- Scribunto and Lua dependencies
 - VisualEditor configuration
 - additional Libre Wiki gadgets
 - complex TemplateStyles dependencies
